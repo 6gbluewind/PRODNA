@@ -1,0 +1,46 @@
+Tr_X=[feature_PSSM_MLAB_543_mm,feature_PRSA_543];
+Te_X=[feature_PSSM_MLAB_TEST_mm,feature_PRSA_TEST];
+[Tr_X,ia_tr,ic_tr]=unique(Tr_X,'rows');
+label_543=label_543(ia_tr,:);
+[Te_X,ia_te,ic_te]=unique(Te_X,'rows');
+label_TEST=label_TEST(ia_te,:);
+X=[Tr_X;Te_X];
+X=line_map(X);
+Train_X=X(1:size(Tr_X,1),:);
+Test_X=X(size(Tr_X,1)+1:end,:);
+rate_n=1;m_boot=19;threshold_T=0.5;
+[Predict_label_f,Scores_f] = bootstrap_EnClassifierWSRC_np( Train_X, label_543, Test_X, label_TEST,0.5, 1.5,rate_n, 19,threshold_T,1);
+[Y_a,X_a,THRE,AUC_a,OPTROCPT,SUBY,SUBYNAMES] = perfcurve(label_TEST,Scores_f(:,1),'1');
+[over_ACC,over_SN,over_Spec,over_PE,over_NPV,over_F_score,over_MCC] = roc( Predict_label_f,label_TEST );
+[mcc_list,acc_lst,sn_list,sp_list,PE_list,rate_p_n_list] = Threhold_Find(Scores_f,label_TEST,0.4,0.90,0.0001,0,0);
+grid on;
+[I,B]=max(mcc_list);
+MAX_MCC_acc=acc_lst(B)
+MAX_MCC_sn=sn_list(B)
+MAX_MCC_sp=sp_list(B)
+MAX_MCC_mcc=mcc_list(B)
+0.4+0.0001*B
+MAX_MCC_pe=PE_list(B)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+Tr_X=[feature_PSSM_MLAB_Train_335,train_PRSA];
+Te_X=[feature_PSSM_MLAB_335_test,test_PRSA];
+X=[Tr_X;Te_X];
+X=line_map(X);
+Train_X=X(1:size(Tr_X,1),:);
+Test_X=X(size(Tr_X,1)+1:end,:);
+rate_n=1;m_boot=19;threshold_T=0.5;
+[Predict_label_f,Scores_f] = bootstrap_EnClassifierWSRC_np( Train_X, train_y, Test_X, test_y,0.5, 1.5,rate_n, m_boot,threshold_T,1);
+[Y_a,X_a,THRE,AUC_a,OPTROCPT,SUBY,SUBYNAMES] = perfcurve(test_y,Scores_f(:,1),'1');
+[over_ACC,over_SN,over_Spec,over_PE,over_NPV,over_F_score,over_MCC] = roc( Predict_label_f,test_y );
+[mcc_list,acc_lst,sn_list,sp_list,PE_list,rate_p_n_list] = Threhold_Find(Scores_f,test_y,0.3,0.90,0.0001);
+grid on;
+[I,B]=max(mcc_list);
+MAX_MCC_acc=acc_lst(B)
+MAX_MCC_sn=sn_list(B)
+MAX_MCC_sp=sp_list(B)
+MAX_MCC_mcc=mcc_list(B)
+0.3+0.0001*B
+MAX_MCC_PE=PE_list(B)
